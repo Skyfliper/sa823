@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Форма быстрого отчета</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"/>
+  <style>
+    select option {
+  color: #000;
+  background-color: #fff;
+}
+    :root{
+      --bg1:#0f2027;--bg2:#203a43;--bg3:#2c5364;
+      --glass:rgba(255,255,255,.06);--glass-2:rgba(255,255,255,.12);
+      --text:#e8eef3;--muted:#a8b3bd;--accent1:#00c6ff;--accent2:#0072ff;
+      --ok:#18d39e;--warn:#ffd166;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family:'Inter',system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      color:var(--text);
+      background: linear-gradient(135deg,var(--bg1),var(--bg2),var(--bg3));
+      background-size:400% 400%;
+      animation:gradient 15s ease infinite;
+      display:flex;align-items:center;justify-content:center;
+      padding:24px;
+    }
+    @keyframes gradient{
+      0%{background-position:0% 50%}
+      50%{background-position:100% 50%}
+      100%{background-position:0% 50%}
+    }
+    .card{
+      width:100%;max-width:860px;
+      background:var(--glass);
+      border:1px solid rgba(255,255,255,.08);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border-radius:20px;
+      box-shadow:0 12px 40px rgba(0,0,0,.45);
+      overflow:hidden;
+      animation:fadeIn .8s ease;
+    }
+    @keyframes fadeIn{
+      from{opacity:0; transform: translateY(14px)}
+      to{opacity:1; transform: translateY(0)}
+    }
+    .card-header{
+      padding:22px 26px;
+      background:linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,0));
+      border-bottom:1px solid rgba(255,255,255,.08);
+      display:flex;align-items:center;justify-content:space-between;
+    }
+    .title{
+      font-weight:600;font-size:20px;letter-spacing:.2px
+    }
+    .badge-soft{
+      padding:6px 10px;border-radius:10px;font-size:12px;
+      color:#0b2a2e;background:rgba(255,255,255,.85);font-weight:600
+    }
+    .card-body{padding:24px}
+    .grid{
+      display:grid;grid-template-columns:1fr 1fr;gap:18px
+    }
+    @media (max-width:720px){ .grid{grid-template-columns:1fr} }
+    label{font-weight:600;color:var(--muted);margin-bottom:8px}
+    .form-control,.custom-select{
+      background:rgba(255,255,255,.08)!important;
+      border:1px solid rgba(255,255,255,.18)!important;
+      color:var(--text)!important;
+      border-radius:12px!important;
+      padding:12px 14px!important;
+      transition: box-shadow .2s,border-color .2s,background .2s;
+    }
+    .form-control:focus,.custom-select:focus{
+      border-color: rgba(0,198,255,.7)!important;
+      box-shadow:0 0 0 4px rgba(0,198,255,.15)!important;
+      background:rgba(255,255,255,.12)!important;
+      outline:none!important;
+    }
+    input[type="date"]::-webkit-calendar-picker-indicator{
+      filter: invert(1); opacity:.8; cursor: pointer
+    }
+    .btn-gradient{
+      background: linear-gradient(45deg,var(--accent1),var(--accent2));
+      border:none;color:white;font-weight:700;
+      border-radius:12px;padding:12px 18px;
+      box-shadow:0 8px 22px rgba(0,114,255,.35);
+      transition: transform .15s ease, box-shadow .2s ease, filter .2s;
+    }
+    .btn-gradient:hover{ transform: translateY(-1px); filter: brightness(1.05) }
+    .btn-gradient:active{ transform: translateY(0) scale(.98) }
+    .actions{display:flex;gap:10px;flex-wrap:wrap}
+    .hint{color:var(--muted);font-size:12px;margin-top:6px}
+    .totals{
+      margin-top:6px;font-weight:600;color:var(--ok);
+      display:flex;gap:14px;flex-wrap:wrap
+    }
+    .output{
+      margin-top:18px;padding:16px;border-radius:12px;
+      background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);
+      white-space:pre-wrap;word-break:break-word;color:var(--text);
+    }
+    .footer{
+      padding:16px 24px;border-top:1px solid rgba(255,255,255,.08);
+      display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px
+    }
+    .meter{
+      height:10px;border-radius:999px;overflow:hidden;background:rgba(255,255,255,.08);
+    }
+    .meter > span{
+      display:block;height:100%;background:linear-gradient(90deg,#20e3b2,#0bb5ff);
+      width:0%; transition:width .25s ease
+    }
+    .fadeUp{opacity:0;animation:fadeUp .5s .15s forwards}
+    @keyframes fadeUp{
+      to{opacity:1; transform:none}
+      from{opacity:0; transform: translateY(10px)}
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="card-header">
+      <div class="title">📋 Форма быстрого отчета</div>
+      <div class="badge-soft">Dark · Glass · Animated</div>
+    </div>
+
+    <div class="card-body">
+      <form id="reportForm">
+        <div class="grid">
+          <div class="form-group fadeUp">
+            <label for="date">📅 Дата</label>
+            <input type="date" class="form-control" id="date" required>
+          </div>
+
+          <div class="form-group fadeUp">
+            <label for="bot">🤖 Бот</label>
+            <select id="bot" class="custom-select" required>
+              <option value="">Выберите</option>
+
+  <!-- Махигул 1–5 -->
+  <option>Махигул 1</option>
+  <option>Махигул 2</option>
+  <option>Махигул 3</option>
+  <option>Махигул 4</option>
+  <option>Махигул 5</option>
+
+  <!-- Насиба 1–4 -->
+  <option>Насиба 1</option>
+  <option>Насиба 2</option>
+  <option>Насиба 3</option>
+  <option>Насиба 4</option>
+
+  <!-- В конце — Зайнура -->
+  <option>Зайнура</option>
+</select>
+
+          </div>
+
+          <div class="form-group fadeUp">
+            <label for="fdCount">📦 FD Кол-во</label>
+            <input type="text" class="form-control" id="fdCount" required>
+            <div class="hint">Только цифры, пробелы добавятся автоматически</div>
+          </div>
+
+          <div class="form-group fadeUp">
+            <label for="rdCount">📦 RD Кол-во</label>
+            <input type="text" class="form-control" id="rdCount" required>
+          </div>
+
+          <div class="form-group fadeUp">
+            <label for="fdSum">💰 FD сумма (сум)</label>
+            <input type="text" class="form-control" id="fdSum" required>
+            <div class="totals" id="fdTotals"></div>
+          </div>
+
+          <div class="form-group fadeUp">
+            <label for="rdSum">💰 RD сумма (сум)</label>
+            <input type="text" class="form-control" id="rdSum" required>
+            <div class="totals" id="rdTotals"></div>
+          </div>
+        </div>
+
+        <div class="form-group fadeUp" style="margin-top:8px">
+          <label for="load">📊 Загруженность (0–10)</label>
+          <input type="number" class="form-control" id="load" min="0" max="10" required>
+          <div class="hint">0 — свободно, 10 — максимум</div>
+          <div class="meter" style="margin-top:8px"><span id="loadBar"></span></div>
+        </div>
+
+        <div class="actions fadeUp" style="margin-top:10px">
+          <button type="button" class="btn btn-gradient" id="genBtn">🚀 Сгенерировать</button>
+          <button type="button" class="btn btn-gradient" id="copyBtn">📋 Скопировать</button>
+        </div>
+      </form>
+
+      <div id="reportOutput" class="output fadeUp" style="display:none"></div>
+    </div>
+
+    <div class="footer">
+      <div class="hint">Подсказка: суммы вводи числом, пробелы и расчеты добавятся автоматически.</div>
+      <div class="hint">Автоконвертация: UZS → USD по формуле (сумма FD + сумма RD)/1000/13.4</div>
+    </div>
+  </div>
+
+  <script>
+    // Настройки
+    const numberFormat = new Intl.NumberFormat('ru-RU');
+
+    // Утилиты форматирования
+    const onlyDigits = (str) => str.replace(/[^\d]/g, '');
+    const prettify = (n) => numberFormat.format(n);
+    const parseNum = (str) => {
+      const s = onlyDigits(String(str||''));
+      return s ? Number(s) : 0;
+    };
+    const sumToUsd = (uzs) => (uzs / 1000 / 13.4).toFixed(2);
+
+    function formatInputLive(el){
+      const pos = el.selectionStart;
+      const raw = parseNum(el.value);
+      el.value = raw ? prettify(raw) : '';
+      // простое восстановление курсора
+      try { el.setSelectionRange(pos, pos); } catch(e){}
+    }
+
+    function formatDateDDMMYY(iso){
+      if(!iso) return '';
+      const d = new Date(iso);
+      const dd = String(d.getDate()).padStart(2,'0');
+      const mm = String(d.getMonth()+1).padStart(2,'0');
+      const yy = String(d.getFullYear()).slice(-2);
+      return `${dd}.${mm}.${yy}`;
+    }
+
+    // Элементы
+    const fdCountEl = document.getElementById('fdCount');
+    const rdCountEl = document.getElementById('rdCount');
+    const fdSumEl   = document.getElementById('fdSum');
+    const rdSumEl   = document.getElementById('rdSum');
+    const loadEl    = document.getElementById('load');
+    const loadBar   = document.getElementById('loadBar');
+    const fdTotals  = document.getElementById('fdTotals');
+    const rdTotals  = document.getElementById('rdTotals');
+    const outEl     = document.getElementById('reportOutput');
+
+    // Лайв-форматирование
+    [fdCountEl, rdCountEl, fdSumEl, rdSumEl].forEach(el=>{
+      el.addEventListener('input', ()=>{
+        formatInputLive(el);
+        updateTotals();
+      });
+      el.addEventListener('blur', ()=> formatInputLive(el));
+    });
+
+    loadEl.addEventListener('input', ()=>{
+      const v = Math.max(0, Math.min(10, Number(loadEl.value||0)));
+      loadBar.style.width = (v*10)+'%';
+    });
+
+    function updateTotals(){
+      const fd = parseNum(fdSumEl.value);
+      const rd = parseNum(rdSumEl.value);
+      const fdUsd = sumToUsd(fd);
+      const rdUsd = sumToUsd(rd);
+      fdTotals.textContent = fd ? `= ${prettify(fd)} сум · $${fdUsd}` : '';
+      rdTotals.textContent = rd ? `= ${prettify(rd)} сум · $${rdUsd}` : '';
+    }
+
+    function buildReport(){
+      const date = formatDateDDMMYY(document.getElementById('date').value);
+      const bot  = document.getElementById('bot').value || '—';
+
+      const fdCount = parseNum(fdCountEl.value);
+      const rdCount = parseNum(rdCountEl.value);
+      const fdSum   = parseNum(fdSumEl.value);
+      const rdSum   = parseNum(rdSumEl.value);
+
+      const totalSum = fdSum + rdSum;
+      const fdUsd = sumToUsd(fdSum);
+      const rdUsd = sumToUsd(rdSum);
+      const totalUsd = sumToUsd(totalSum);
+
+      const load = Math.max(0, Math.min(10, Number(loadEl.value||0)));
+
+      const lines = [
+        `${date}`,
+        ``,
+        `${bot}`,
+        ``,
+        `FD ${prettify(fdCount)} | ${prettify(fdSum)} | $${fdUsd}`,
+        `RD ${prettify(rdCount)} | ${prettify(rdSum)} | $${rdUsd}`,
+        ``,
+        `Общая: ${prettify(totalSum)} | $${totalUsd}`,
+        ``,
+        `Загруженность: ${load}/10`
+      ];
+      return lines.join('\n');
+    }
+
+    function showReport(){
+      const txt = buildReport();
+      outEl.style.display = 'block';
+      outEl.textContent = txt;
+    }
+
+    async function copyReport(){
+      const txt = outEl.style.display==='block' ? outEl.textContent : buildReport();
+      try{
+        await navigator.clipboard.writeText(txt);
+        flashCopySuccess();
+      }catch(e){
+        // Фоллбэк
+        const ta = document.createElement('textarea');
+        ta.value = txt;
+        document.body.appendChild(ta);
+        ta.select(); document.execCommand('copy');
+        document.body.removeChild(ta);
+        flashCopySuccess();
+      }
+    }
+    
+
+    function flashCopySuccess(){
+      const btn = document.getElementById('copyBtn');
+      const old = btn.textContent;
+      btn.textContent = '✅ Скопировано';
+      setTimeout(()=> btn.textContent = old, 1200);
+    }
+
+    document.getElementById('genBtn').addEventListener('click', showReport);
+    document.getElementById('copyBtn').addEventListener('click', copyReport);
+
+    // Инициализация
+    updateTotals();
+  </script>
+</body>
+</html><!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Онлайн редактор кода GuruWeba</title>
+</head>
+<body>
+
+    <p></p>
+
+</body>
+</html>
